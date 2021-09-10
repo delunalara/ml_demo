@@ -300,7 +300,7 @@ if problem_type == 'Classification':
 
     st.write(pd.DataFrame([train_metrics, test_metrics], index=['train_set', 'test_set']))
 
-    if hasattr(model, 'coef_'):
+    if hasattr(model, 'coef_') and algorithm not in ['SVM']:
         st.markdown('### Coefficients')
         plot_data = model.coef_
         plot_xlabel = 'Coefficient'
