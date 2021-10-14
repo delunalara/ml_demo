@@ -1,12 +1,10 @@
-from altair.vegalite.v4.schema.channels import Y
-from sklearn import preprocessing
-import streamlit as st
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 import re
+
 import altair as alt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import streamlit as st
 
 # Regression
 from sklearn.linear_model import LinearRegression
@@ -214,7 +212,7 @@ if problem_type == 'Regression':
             if robust == 'TheilSen':
                 model = TheilSenRegressor(random_state=42)
             if robust == 'RANSAC':
-                model = RANSACRegressor(base_model, random_state=42)
+                model = RANSACRegressor(base_model, min_samples=0.5, random_state=42)
         else:
             alpha = st.slider('alpha', 0.0, 1.0, 0.0, 0.01)
             if regularization == 'l1':
@@ -455,7 +453,10 @@ if problem_type == 'Regression':
     if algorithm not in ['kNN'] and plot_coef:
         if algorithm == 'Linear Regression':
             st.markdown('### Coefficients')
-            plot_data = model.steps[1][1].coef_.tolist() + [model.steps[1][1].intercept_]
+            if robust == 'RANSAC':
+                plot_data = model.steps[1][1].estimator_.coef_.tolist() + [model.steps[1][1].estimator_.intercept_]
+            else:
+                plot_data = model.steps[1][1].coef_.tolist() + [model.steps[1][1].intercept_]
             plot_labels = model.steps[0][1].get_feature_names(X_train.columns) + ['intercept']
             plot_xlabel = 'Coefficient'
         else:
@@ -543,4 +544,5 @@ if problem_type == 'Regression':
         height=400,
         title="One vs Response"
     )
+
     st.write(one_vs_response)
